@@ -1,8 +1,7 @@
 package net.mckitsu.lib.sqlite;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import net.mckitsu.lib.file.FileManager;
 import net.mckitsu.lib.util.EventHandler;
 
 import java.sql.*;
@@ -25,6 +24,10 @@ public class SQLite {
      */
     public SQLite(String filePath){
         this.filePath = filePath;
+    }
+
+    public SQLite(FileManager file){
+        this.filePath = file.getDirPath() + '\\' + file.getFileName();
     }
     /* **************************************************************************************
      *  Override method
@@ -55,11 +58,16 @@ public class SQLite {
     }
 
     public Map<String, SQLiteTable> getTables(){
-        return this.tableList;
+        return new HashMap<>(this.tableList);
     }
 
     public SQLiteTable getTable(String tableName){
-        return this.tableList.get(tableName);
+        SQLiteTable result = this.tableList.get(tableName);
+
+        if(result==null)
+            return null;
+
+        return result.clone();
     }
 
     public boolean tableIsExist(String tableName){
@@ -97,12 +105,38 @@ public class SQLite {
         }
     }
 
+    public SQLiteTable select(String tableName, String primaryKey){
+        SQLiteTable result = this.tableList.get(tableName).clone();
+
+        if(result == null){
+            return null;
+        }
+
+        String command = "SELECT * FROM \"%s\" WHERE \"%s\" = \"%s\";";
+
+        String sql = String.format(command, tableName, result.getPrimaryKey(), primaryKey);
+
+        try {
+            ResultSet resultSet = this.statement.executeQuery(sql);
+            HashMap<String, String> data = new HashMap<>();
+            for(Map.Entry<String, String> entry : result.getTable().entrySet())
+                data.put(entry.getKey(), resultSet.getString(entry.getKey()));
+
+            result.setTable(data);
+            resultSet.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+        return result;
+    }
+
     public Status insert(SQLiteTable data){
         SQLiteTable sourceFormat = this.tableList.get(data.getTableName());
         if(sourceFormat == null)
             return Status.TABLE_IS_NOT_EXIST;
 
-        String command = "INSERT INTO STRUCT (%s) VALUES (%s);";
+        String command = "INSERT OR REPLACE INTO \"%s\" (%s) VALUES (%s);";
         StringBuilder struct = new StringBuilder();
         StringBuilder value = new StringBuilder();
 
@@ -114,29 +148,53 @@ public class SQLite {
             if(typeName == null)
                 return Status.TABLE_FORMAT_NOT_MATCH;
 
-            //if(typeName.contains("CHAR")){
+            System.out.println("typeName: " + typeName);
+
+            if(typeName.contains("CHAR")){
                 value.append(String.format("\"%s\",", table.getValue()));
-            //}
+            }else if(typeName.contains("TEXT")){
+                value.append(String.format("\"%s\",", table.getValue()));
+            }else if(typeName.contains("INT")){
+                try{
+                    Integer.parseInt(table.getValue());
+                }catch(NumberFormatException|NullPointerException  e) {
+                    return Status.PARAM_ERROR;
+                }
+                value.append(String.format("%s,", table.getValue()));
+            }
         }
 
         struct.deleteCharAt(struct.length()-1);
         value.deleteCharAt(value.length()-1);
 
-        System.out.println(struct.toString());
-        System.out.println(value.toString());
+        String sql = String.format(command, data.getTableName(), struct.toString(), value.toString());
+
+        try {
+            this.statement.executeUpdate(sql);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return Status.TRANSFER_ERROR;
+        }
         return Status.SUCCESS;
     }
 
     public void close(){
-        try {
-            this.statement.close();
-        } catch (SQLException|NullPointerException throwables) {
-            throwables.printStackTrace();
+        if(this.statement != null){
+            try {
+                this.statement.close();
+                this.statement = null;
+            } catch (SQLException|NullPointerException throwables) {
+                throwables.printStackTrace();
+            }
         }
 
-        try {
-            this.connection.close();
-        } catch (SQLException|NullPointerException ignored) {}
+        if(this.connection != null){
+            try {
+                this.connection.close();
+                this.connection = null;
+                event.onDisconnect(this);
+            } catch (SQLException|NullPointerException ignored) {}
+        }
     }
 
     /* **************************************************************************************
@@ -218,6 +276,7 @@ public class SQLite {
         TABLE_IS_EXIST,
         TABLE_IS_NOT_EXIST,
         TABLE_FORMAT_NOT_MATCH,
+        TRANSFER_ERROR,
     }
 
 }

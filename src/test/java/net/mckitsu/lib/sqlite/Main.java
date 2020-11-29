@@ -1,7 +1,5 @@
 package net.mckitsu.lib.sqlite;
 
-import java.util.Map;
-
 public class Main {
     public static void main(String[] args){
         SQLite sqLite = new SQLite("database.db");
@@ -14,9 +12,14 @@ public class Main {
         }
 
         SQLiteTable table = sqLite.getTable("inventory");
-        table.getTable().put("uuid", "9a59d9ce-fdbe-4a68-8a3b-5aec7d559809");
+        System.out.println(table);
 
-        sqLite.insert(table);
+        table.getTable().put("uuid", "9a59d9ce-fdbe-4a68-8a3b-5aec7d559809");
+        table.getTable().put("writeTime", "1234");
+
+        System.out.println(sqLite.insert(table));
+
+        System.out.println(sqLite.select("inventory", "9a59d9ce-fdbe-4a68-8a3b-5aec7d559809"));
 
     }
 }
