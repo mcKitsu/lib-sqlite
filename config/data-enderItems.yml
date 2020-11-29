@@ -1,0 +1,7 @@
+sql: data
+tableName: enderItems
+primaryKey: uuid
+table:
+    uuid: CHAR(36)
+    writeTime: INT
+    enderItems: TEXT

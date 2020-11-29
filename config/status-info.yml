@@ -1,0 +1,9 @@
+sql: status
+tableName: info
+primaryKey: uuid
+table:
+    uuid: CHAR(36)
+    writeTime: INT
+    firstPlayed: INT
+    lastPlayed: INT
+    lastKnownName: CHAR(16)
