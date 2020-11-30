@@ -93,8 +93,6 @@ public class SQLite {
 
         String sql = String.format(command, table.getTableName(), tables.toString());
 
-        System.out.println(sql);
-
         try {
             this.statement.executeUpdate(sql);
             this.tableList.put(table.getTableName(), table);
@@ -147,8 +145,6 @@ public class SQLite {
             String typeName = sourceFormat.getTable().get(table.getKey());
             if(typeName == null)
                 return Status.TABLE_FORMAT_NOT_MATCH;
-
-            System.out.println("typeName: " + typeName);
 
             if(typeName.contains("CHAR")){
                 value.append(String.format("\"%s\",", table.getValue()));
