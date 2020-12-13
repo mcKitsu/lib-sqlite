@@ -22,10 +22,19 @@ public class SQLite {
     /* **************************************************************************************
      *  Construct method
      */
+
+    /**
+     * 使用檔案路徑
+     * @param filePath 檔案路徑
+     */
     public SQLite(String filePath){
         this.filePath = filePath;
     }
 
+    /**
+     * 使用檔案初始化
+     * @param file 檔案
+     */
     public SQLite(FileManager file){
         this.filePath = file.getDirPath() + '\\' + file.getFileName();
     }
@@ -33,9 +42,11 @@ public class SQLite {
      *  Override method
      */
 
-    /* **************************************************************************************
-     *  Public method
+    /**
+     * 連線至SQLite檔案
+     * @return 如果連線成功
      */
+
     public boolean connect(){
         if(this.connection != null){
             try {
@@ -57,10 +68,21 @@ public class SQLite {
         }
     }
 
+    /**
+     * 取得所有資料表
+     *
+     * @return 資料表內容
+     */
     public Map<String, SQLiteTable> getTables(){
         return new HashMap<>(this.tableList);
     }
 
+    /**
+     * 取得特定資料表
+     *
+     * @param tableName 資料表名稱
+     * @return 資料表內容
+     */
     public SQLiteTable getTable(String tableName){
         SQLiteTable result = this.tableList.get(tableName);
 
@@ -70,10 +92,23 @@ public class SQLite {
         return result.clone();
     }
 
+    /**
+     * 確認資料表是否存在
+     *
+     * @param tableName 資料表名稱
+     * @return 存在與否
+     */
     public boolean tableIsExist(String tableName){
         return this.tableList.get(tableName) != null;
     }
 
+    /**
+     * 新增一個資料表
+     *
+     * @param table 資料表
+     * @return 新增的結果
+     * @see Status
+     */
     public Status createTable(SQLiteTable table){
         if(this.tableIsExist(table.getTableName()))
             return Status.TABLE_IS_EXIST;
@@ -103,6 +138,12 @@ public class SQLite {
         }
     }
 
+    /**
+     * 利用主鍵和資料表來查詢資料
+     * @param tableName 資料表名稱
+     * @param primaryKey 主鍵
+     * @return 利用該主鍵查出的資料
+     */
     public SQLiteTable select(String tableName, String primaryKey){
         SQLiteTable result = this.tableList.get(tableName).clone();
 
@@ -129,6 +170,12 @@ public class SQLite {
         return result;
     }
 
+    /**
+     * 插入資料
+     * @param data 欲插入資料的資料表
+     * @return 插入資料的結果
+     * @see Status
+     */
     public Status insert(SQLiteTable data){
         SQLiteTable sourceFormat = this.tableList.get(data.getTableName());
         if(sourceFormat == null)
@@ -174,6 +221,9 @@ public class SQLite {
         return Status.SUCCESS;
     }
 
+    /**
+     * 關閉連線
+     */
     public void close(){
         if(this.statement != null){
             try {
@@ -199,6 +249,10 @@ public class SQLite {
 
     /* **************************************************************************************
      *  Private method
+     */
+
+    /**
+     * 載入多個資料表
      */
     private void loadTables(){
         try {
@@ -244,6 +298,7 @@ public class SQLite {
     /* **************************************************************************************
      *  Class Event
      */
+
     @Setter
     public static class Event extends EventHandler{
         private Consumer<SQLite> onConnect;
@@ -265,6 +320,10 @@ public class SQLite {
 
     /* **************************************************************************************
      *  Enum Status
+     */
+
+    /**
+     * 狀態代碼
      */
     public enum Status{
         SUCCESS,
