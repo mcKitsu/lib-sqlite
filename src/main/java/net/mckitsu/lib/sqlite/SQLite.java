@@ -252,7 +252,7 @@ public class SQLite {
      */
 
     /**
-     * 載入多個資料表
+     * 取的資料庫中所有資料表
      */
     private void loadTables(){
         try {
