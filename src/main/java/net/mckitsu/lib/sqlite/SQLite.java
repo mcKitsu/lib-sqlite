@@ -1,6 +1,5 @@
 package net.mckitsu.lib.sqlite;
 
-import lombok.Setter;
 import net.mckitsu.lib.file.FileManager;
 import net.mckitsu.lib.util.EventHandler;
 
@@ -299,7 +298,6 @@ public class SQLite {
      *  Class Event
      */
 
-    @Setter
     public static class Event extends EventHandler{
         private Consumer<SQLite> onConnect;
         private Consumer<SQLite> onDisconnect;
@@ -315,6 +313,18 @@ public class SQLite {
 
         private void onDisconnect(SQLite sqLite){
             super.execute(this.onDisconnect, sqLite);
+        }
+
+        public void setOnConnect(Consumer<SQLite> onConnect) {
+            this.onConnect = onConnect;
+        }
+
+        public void setOnDisconnect(Consumer<SQLite> onDisconnect) {
+            this.onDisconnect = onDisconnect;
+        }
+
+        public void setOnConnectFail(Consumer<SQLite> onConnectFail) {
+            this.onConnectFail = onConnectFail;
         }
     }
 
