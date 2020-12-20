@@ -22,31 +22,38 @@ public class SQLiteTable {
         result.table = new HashMap<>(table);
         return result;
     }
-
+    /** 取得資料表名稱
+     * @return 資料表名稱**/
     public String getTableName() {
         return this.tableName;
     }
-
+    /** 取得資料表主鍵
+     * @return 主鍵的值**/
     public String getPrimaryKey() {
         return this.primaryKey;
     }
-
+    /** 取得資料表
+     * @return 資料表**/
     public Map<String, String> getTable() {
         return this.table;
     }
-
+    /** 設定資料表名稱
+     * @param tableName 資料表名稱
+     * **/
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
-
+    /** 設定資料表主鍵
+     * @param primaryKey 主鍵**/
     public void setPrimaryKey(String primaryKey) {
         this.primaryKey = primaryKey;
     }
-
+    /** 設定資料表
+     * @param table 資料表**/
     public void setTable(Map<String, String> table) {
         this.table = table;
     }
-
+    /** 判斷兩資料表是否相同 **/
     public boolean equals(final Object o) {
         if (o == this) return true;
         if (!(o instanceof SQLiteTable)) return false;
@@ -64,11 +71,13 @@ public class SQLiteTable {
         if (this$table == null ? other$table != null : !this$table.equals(other$table)) return false;
         return true;
     }
-
+    /** 判斷兩Object是否能被比較
+     * @param other 其他的Object
+     * @return 確認後的結果**/
     protected boolean canEqual(final Object other) {
         return other instanceof SQLiteTable;
     }
-
+    /** 取得哈希值 **/
     public int hashCode() {
         final int PRIME = 59;
         int result = 1;
@@ -80,7 +89,7 @@ public class SQLiteTable {
         result = result * PRIME + ($table == null ? 43 : $table.hashCode());
         return result;
     }
-
+    /** 把資料表轉換成文字 **/
     public String toString() {
         return "SQLiteTable(tableName=" + this.getTableName() + ", primaryKey=" + this.getPrimaryKey() + ", table=" + this.getTable() + ")";
     }
